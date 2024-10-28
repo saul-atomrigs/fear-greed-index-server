@@ -20,13 +20,14 @@ app.get('/scrape', async (req, res) => {
 
     // Wait for the selector that contains the Fear & Greed index value
     await page.waitForSelector('span.market-fng-gauge__dial-number-value');
+    await page.waitForSelector('div.market-fng-gauge__timestamp')
 
     // Scrape the fear & greed value
     const result = await page.evaluate(() => {
       // Get the Fear & Greed index value
       const fearAndGreedValue = document.querySelector('span.market-fng-gauge__dial-number-value')?.textContent?.trim() || 'N/A';
-
-      return { fearAndGreedValue };
+      const timestamp = document.querySelector('div.market-fng-gauge__timestamp')?.textContent?.trim() || 'N/A';
+      return { fearAndGreedValue, timestamp };
     });
 
     // Close the browser after scraping
@@ -34,7 +35,8 @@ app.get('/scrape', async (req, res) => {
 
     // Respond with the scraped data
     res.json({
-      fearAndGreedIndex: result.fearAndGreedValue
+      fearAndGreedIndex: result.fearAndGreedValue,
+      timestamp: result.timestamp
     });
 
     // Log for debugging
